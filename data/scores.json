@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "username": "player1",
+      "password": "abc123",
+      "wins": 0,
+      "losses": 0,
+      "streak": 0
+    },
+    {
+      "username": "player2",
+      "password": "abc123",
+      "wins": 0,
+      "losses": 0,
+      "streak": 0
+    }
+  ],
+  "leaderboard": [
+    {
+      "username": "player1",
+      "wins": 0,
+      "losses": 0,
+      "streak": 0
+    },
+    {
+      "username": "player2",
+      "wins": 0,
+      "losses": 0,
+      "streak": 0
+    }
+  ]
+}
