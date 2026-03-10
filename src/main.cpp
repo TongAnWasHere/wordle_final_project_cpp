@@ -57,7 +57,7 @@ int main() {
                }) |
                center;
 
-  auto screen = Screen::Create(Dimension::Full());
+  auto screen = Screen::Create(Dimension::Fixed(50));
   Render(screen, board);
   screen.Print();
   return 0;
