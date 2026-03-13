@@ -20,7 +20,13 @@ FetchContent_Declare(
   GIT_TAG v5.0.0
 )
 
-FetchContent_MakeAvailable(nlohmann_json ftxui)
+FetchContent_Declare(
+  tabulate
+  GIT_REPOSITORY https://github.com/p-ranav/tabulate.git
+  GIT_TAG v1.5
+)
+
+FetchContent_MakeAvailable(nlohmann_json ftxui tabulate)
 
 # ── Executable ───────────────────────────────────────────────────────────────
 add_executable(wordle
@@ -34,4 +40,5 @@ target_link_libraries(wordle PRIVATE
   ftxui::screen
   ftxui::dom
   ftxui::component
+  tabulate::tabulate
 )
