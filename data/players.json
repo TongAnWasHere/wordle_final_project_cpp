@@ -1,0 +1,10 @@
+{
+  "players": [
+    {
+      "password": "abc123",
+      "streak": 5,
+      "username": "Tongan",
+      "wins": 5
+    }
+  ]
+}
