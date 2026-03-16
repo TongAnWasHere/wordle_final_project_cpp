@@ -34,7 +34,6 @@ add_executable(wordle
 )
 
 # target_include_directories(wordle PRIVATE include)
-
 target_link_libraries(wordle PRIVATE
   nlohmann_json::nlohmann_json
   ftxui::screen
