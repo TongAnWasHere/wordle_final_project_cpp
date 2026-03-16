@@ -1,4 +1,3 @@
-// main.cpp
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -8,9 +7,7 @@
 #include <random>
 #include <string>
 #include <vector>
-
 #include <nlohmann/json.hpp>
-
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/screen_interactive.hpp>
@@ -18,8 +15,7 @@
 
 using json = nlohmann::json;
 using namespace ftxui;
-using std::string;
-using std::vector;
+using namespace std;
 namespace fs = std::filesystem;
 
 struct Player {
@@ -33,9 +29,7 @@ struct Player {
 static constexpr int WORD_LEN = 5;
 static constexpr int MAX_ROWS = 6;
 
-/////////////////////////
-// Path helper methods //
-/////////////////////////
+// Path helper methods
 
 fs::path FindProjectRoot() {
   fs::path current = fs::current_path();
@@ -62,9 +56,7 @@ fs::path WordBankFilePath() {
   return FindProjectRoot() / "data" / "wordbank.json";
 }
 
-/////////////////////
-// JSON IO helpers //
-/////////////////////
+// JSON IO helpers
 
 vector<Player> LoadPlayers(const fs::path& path = PlayersFilePath()) {
   vector<Player> result;
@@ -92,7 +84,6 @@ vector<Player> LoadPlayers(const fs::path& path = PlayersFilePath()) {
     p.isGuest = false;
     result.push_back(p);
   }
-
   return result;
 }
 
@@ -152,9 +143,7 @@ vector<string> LoadWordBank(const fs::path& path = WordBankFilePath()) {
   return words;
 }
 
-/////////////////////
-// Game primitives //
-/////////////////////
+// Game primitives 
 
 enum class State { BLANK, CORRECT, MISPLACE, INCORRECT };
 
@@ -231,9 +220,7 @@ void EvaluateGuess(Row& row, string target) {
   }
 }
 
-/////////////////////
-// FTXUI - Game UI //
-/////////////////////
+// FTXUI - Game UI 
 
 bool RunGameFTXUI(const vector<string>& wordBank, Player& player) {
   if (wordBank.empty()) return false;
@@ -336,11 +323,8 @@ bool RunGameFTXUI(const vector<string>& wordBank, Player& player) {
   return won;
 }
 
-////////////////////////////////
-// After-game options dialog  //
-////////////////////////////////
+// post-game options  
 
-// Returns 0 = Play Again, 1 = Return to Menu
 int ShowAfterGameOptions(bool isGuest, const string& username) {
   int choice = -1;
   auto screen = ScreenInteractive::Fullscreen();
@@ -368,9 +352,7 @@ int ShowAfterGameOptions(bool isGuest, const string& username) {
   return choice;
 }
 
-/////////////////////
 // FTXUI - Dialogs //
-/////////////////////
 
 std::optional<std::pair<string, string>> LoginDialog() {
   auto screen = ScreenInteractive::Fullscreen();
@@ -379,13 +361,13 @@ std::optional<std::pair<string, string>> LoginDialog() {
   auto username_input = Input(&username, "username");
   auto password_input = Input(&password, "password");
 
-  auto okay = Button("Okay", screen.ExitLoopClosure());
+  auto login = Button("Log in", screen.ExitLoopClosure());
   auto cancel = Button("Cancel", screen.ExitLoopClosure());
 
   auto form = Container::Vertical({
       username_input,
       password_input,
-      Container::Horizontal({okay, cancel}),
+      Container::Horizontal({login, cancel}),
   });
 
   auto renderer = Renderer(form, [&] {
@@ -394,7 +376,7 @@ std::optional<std::pair<string, string>> LoginDialog() {
                separator(),
                hbox(text("Username: "), username_input->Render()) | center,
                hbox(text("Password: "), password_input->Render()) | center,
-               hbox(okay->Render(), separator(), cancel->Render()) | center,
+               hbox(login->Render(), separator(), cancel->Render()) | center,
            }) |
            center | border;
   });
@@ -479,15 +461,15 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
     }
   }
 
-  auto okay = Button("Okay", screen.ExitLoopClosure());
+  auto back = Button("Back", screen.ExitLoopClosure());
 
-  auto renderer = Renderer(okay, [&] {
+  auto renderer = Renderer(back, [&] {
     return vbox({
                text("Leaderboard") | bold | center,
                separator(),
                vbox(lines) | center,
                separator(),
-               okay->Render() | center,
+               back->Render() | center,
            }) |
            center | border;
   });
@@ -495,9 +477,7 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
   screen.Loop(renderer);
 }
 
-/////////////////////
-// Session helpers //
-/////////////////////
+// Session helpers
 
 void SaveCurrentPlayer(Player& currentPlayer, vector<Player>& players) {
   if (currentPlayer.isGuest) return;
@@ -535,9 +515,7 @@ void PlaySessionLoop(Player& currentPlayer,
   }
 }
 
-/////////////////////
-// main loop       //
-/////////////////////
+// main loop
 
 int main() {
   auto wordBank = LoadWordBank();
