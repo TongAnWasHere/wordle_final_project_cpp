@@ -5,6 +5,12 @@
       "streak": 5,
       "username": "Tongan",
       "wins": 5
+    },
+    {
+      "password": "1111",
+      "streak": 2,
+      "username": "thanu",
+      "wins": 2
     }
   ]
 }
