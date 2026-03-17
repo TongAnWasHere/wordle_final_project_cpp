@@ -49,6 +49,50 @@ struct Tile {
 static const int word_len = 5;
 static const int max_rows = 6;
 static const int words_per_page = 15;
+static const int menu_button_width = 40;
+
+Element ColoredSubtitleLine(const string& left,
+                            const string& middle,
+                            const string& right) {
+  return hbox({
+             text(left) | color(Color::Green),
+             text(middle) | color(Color::Yellow),
+             text(right) | color(Color::Red),
+         }) |
+         bold | center;
+}
+
+Element RenderWordleTitle() {
+  return vbox({
+             text(" █████   ███   █████                                 █████    ████                                           ") | bold | center,
+             text("▒▒███   ▒███  ▒▒███                                 ▒▒███    ▒▒███                     ███            ███    ") | bold | center,
+             text(" ▒███   ▒███   ▒███      ██████     ████████      ███████     ▒███      ██████        ▒███           ▒███    ") | bold | center,
+             text(" ▒███   ▒███   ▒███     ███▒▒███   ▒▒███▒▒███    ███▒▒███     ▒███     ███▒▒███    ███████████    ███████████") | bold | center,
+             text(" ▒▒███  █████  ███     ▒███ ▒███    ▒███ ▒▒▒    ▒███ ▒███     ▒███    ▒███████    ▒▒▒▒▒███▒▒▒    ▒▒▒▒▒███▒▒▒ ") | bold | center,
+             text("  ▒▒▒█████▒█████▒      ▒███ ▒███    ▒███        ▒███ ▒███     ▒███    ▒███▒▒▒         ▒███           ▒███    ") | bold | center,
+             text("    ▒▒███ ▒▒███        ▒▒██████     █████       ▒▒████████    █████   ▒▒██████        ▒▒▒            ▒▒▒     ") | bold | center,
+             text("     ▒▒▒   ▒▒▒          ▒▒▒▒▒▒     ▒▒▒▒▒         ▒▒▒▒▒▒▒▒    ▒▒▒▒▒     ▒▒▒▒▒▒                                ") | bold | center,
+             text("") | size(HEIGHT, EQUAL, 1),
+             text("") | size(HEIGHT, EQUAL, 1),
+
+             ColoredSubtitleLine(
+                 "██     ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄     ",
+                 "▄████  ▄▄ ▄▄ ▄▄▄▄▄  ▄▄▄▄  ▄▄▄▄ ▄▄ ▄▄  ▄▄  ▄▄▄▄    ",
+                 "▄████   ▄▄▄  ▄▄   ▄▄ ▄▄▄▄▄"),
+
+             ColoredSubtitleLine(
+                 " ██ ▄█▄ ██ ██▀██ ██▄█▄ ██▀██   ",
+                 "██  ▄▄▄ ██ ██ ██▄▄  ███▄▄ ███▄▄ ██ ███▄██ ██ ▄▄   ",
+                 "██  ▄▄▄ ██▀██ ██▀▄▀██ ██▄▄  "),
+
+             ColoredSubtitleLine(
+                 "  ▀██▀██▀  ▀███▀ ██ ██ ████▀   ",
+                 " ▀███▀  ▀███▀ ██▄▄▄ ▄▄██▀ ▄▄██▀ ██ ██ ▀██ ▀███▀   ",
+                 " ▀███▀  ██▀██ ██   ██ ██▄▄▄ "),
+
+             text("") | size(HEIGHT, EQUAL, 1),
+         });
+}
 
 // Path helper methods
 
@@ -465,9 +509,9 @@ void EvaluateGuess(Row& row, string target) {
 
 // Dialog helpers 
 
-void ShowMessageDialog(const string& message) {
+void ConfirmationDialog(const string& message) {
   auto screen = ScreenInteractive::Fullscreen();
-  auto okay = Button("Okay", screen.ExitLoopClosure());
+  auto okay = Button("Continue", screen.ExitLoopClosure());
 
   auto renderer = Renderer(okay, [&] {
     return vbox({
@@ -872,7 +916,7 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       inputWord = ToUpperWord(inputWord);
 
       if (!IsValidWord(inputWord)) {
-        ShowMessageDialog("Word must be exactly 5 letters.");
+        ConfirmationDialog("Word must be exactly 5 letters.");
         continue;
       }
 
@@ -885,14 +929,14 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       }
 
       if (exists) {
-        ShowMessageDialog("That word already exists.");
+        ConfirmationDialog("That word already exists.");
         continue;
       }
 
       wordBank.push_back(inputWord);
       sort(wordBank.begin(), wordBank.end());
       SaveWordBank(wordBank);
-      ShowMessageDialog("Word added.");
+      ConfirmationDialog("Word added.");
     } else if (action == 3) {
       string inputWord = "";
       bool gotInput = SingleInputDialog("Remove Word", "Word: ",
@@ -913,13 +957,13 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       }
 
       if (index == -1) {
-        ShowMessageDialog("Word not found.");
+        ConfirmationDialog("Word not found.");
         continue;
       }
 
       wordBank.erase(wordBank.begin() + index);
       SaveWordBank(wordBank);
-      ShowMessageDialog("Word removed.");
+      ConfirmationDialog("Word removed.");
     } else {
       return;
     }
@@ -1040,7 +1084,7 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
       }
 
       if (username == "admin") {
-        ShowMessageDialog("Admin cannot be deleted.");
+        ConfirmationDialog("Admin cannot be deleted.");
         continue;
       }
 
@@ -1054,13 +1098,13 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
       }
 
       if (index == -1) {
-        ShowMessageDialog("Player not found.");
+        ConfirmationDialog("Player not found.");
         continue;
       }
 
       players.erase(players.begin() + index);
       SavePlayers(players);
-      ShowMessageDialog("Player deleted.");
+      ConfirmationDialog("Player deleted.");
     } else {
       return;
     }
@@ -1141,7 +1185,6 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
                separator(),
                vbox(board) | center,
                separator(),
-               text("Press Esc to open menu.") | center,
                text(message) | center,
            }) |
            center;
@@ -1315,16 +1358,16 @@ int main() {
 
       auto renderer = Renderer(menu, [&] {
         return vbox({
-                   text("=== WORDLE ===") | bold | center,
-                   separator(),
+                   RenderWordleTitle(),
                    text("Not logged in") | center,
                    text("") | size(HEIGHT, EQUAL, 1),
                    vbox({
-                       login_btn->Render(),
-                       signup_btn->Render(),
-                       guest_btn->Render(),
-                       leaderboard_btn->Render(),
-                       exit_btn->Render(),
+                       login_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       signup_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       guest_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       leaderboard_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
                    }) |
                        center,
                }) |
@@ -1344,7 +1387,7 @@ int main() {
 
         if (username == "admin" && password == "admin123") {
           currentPlayer = MakeAdminPlayer();
-          ShowMessageDialog("Logged in as admin.");
+          ConfirmationDialog("Logged in as admin.");
           continue;
         }
 
@@ -1353,9 +1396,9 @@ int main() {
 
         if (found) {
           currentPlayer = loggedInPlayer;
-          ShowMessageDialog("Logged in as: " + currentPlayer.username);
+          ConfirmationDialog("Logged in as: " + currentPlayer.username);
         } else {
-          ShowMessageDialog("Invalid username or password.");
+          ConfirmationDialog("Invalid username or password.");
         }
 
       } else if (menu_choice == 1) {
@@ -1368,13 +1411,13 @@ int main() {
         }
 
         if (!IsValidUsername(username)) {
-          ShowMessageDialog(
+          ConfirmationDialog(
               "Invalid username. Letters, numbers, underscores only.");
           continue;
         }
 
         if (UsernameTaken(players, username)) {
-          ShowMessageDialog("Username already taken.");
+          ConfirmationDialog("Username already taken.");
           continue;
         }
 
@@ -1390,7 +1433,7 @@ int main() {
         SavePlayers(players);
         currentPlayer = newPlayer;
 
-        ShowMessageDialog("Account created. Logged in as: " +
+        ConfirmationDialog("Account created. Logged in as: " +
                           currentPlayer.username);
 
       } else if (menu_choice == 2) {
@@ -1421,7 +1464,7 @@ int main() {
         screen.ExitLoopClosure()();
       });
 
-      auto delete_players_btn = Button("Delete Players", [&] {
+      auto delete_players_btn = Button("Delete Player", [&] {
         menu_choice = 13;
         screen.ExitLoopClosure()();
       });
@@ -1453,18 +1496,23 @@ int main() {
 
       auto renderer = Renderer(menu, [&] {
         return vbox({
-                   text("=== WORDLE ===") | bold | center,
+                   RenderWordleTitle(),
                    separator(),
                    text("Logged in as: admin") | bold | center,
                    text("") | size(HEIGHT, EQUAL, 1),
                    vbox({
-                       play_btn->Render(),
-                       daily_btn->Render(),
-                       word_bank_btn->Render(),
-                       delete_players_btn->Render(),
-                       leaderboard_btn->Render(),
-                       logout_btn->Render(),
-                       exit_btn->Render(),
+                       play_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       daily_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       word_bank_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       delete_players_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       leaderboard_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       logout_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
                    }) |
                        center,
                }) |
@@ -1490,7 +1538,7 @@ int main() {
         ShowLeaderboardDialog(players);
       } else if (menu_choice == 15) {
         currentPlayer = MakeGuestPlayer();
-        ShowMessageDialog("Logged out.");
+        ConfirmationDialog("Logged out.");
       } else if (menu_choice == 16) {
         return 0;
       }
@@ -1531,17 +1579,20 @@ int main() {
 
       auto renderer = Renderer(menu, [&] {
         return vbox({
-                   text("=== WORDLE ===") | bold | center,
+                   RenderWordleTitle(),
                    separator(),
                    text("Logged in as: " + currentPlayer.username) | bold |
                        center,
                    text("") | size(HEIGHT, EQUAL, 1),
                    vbox({
-                       play_btn->Render(),
-                       daily_btn->Render(),
-                       leaderboard_btn->Render(),
-                       logout_btn->Render(),
-                       exit_btn->Render(),
+                       play_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       daily_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       leaderboard_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       logout_btn->Render() |
+                           size(WIDTH, EQUAL, menu_button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
                    }) |
                        center,
                }) |
@@ -1559,7 +1610,7 @@ int main() {
         ShowLeaderboardDialog(players);
       } else if (menu_choice == 23) {
         currentPlayer = MakeGuestPlayer();
-        ShowMessageDialog("Logged out.");
+        ConfirmationDialog("Logged out.");
       } else if (menu_choice == 24) {
         return 0;
       }
