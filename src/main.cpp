@@ -8,9 +8,7 @@
 #include <random>
 #include <string>
 #include <vector>
-
 #include <nlohmann/json.hpp>
-
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/screen_interactive.hpp>
@@ -48,13 +46,11 @@ struct Tile {
   State state;
 };
 
-static const int WORD_LEN = 5;
-static const int MAX_ROWS = 6;
-static const int WORDS_PER_PAGE = 15;
+static const int word_len = 5;
+static const int max_rows = 6;
+static const int words_per_page = 15;
 
-/////////////////////////
-// Path helper methods //
-/////////////////////////
+// Path helper methods
 
 fs::path FindProjectRoot() {
   fs::path current = fs::current_path();
@@ -88,9 +84,7 @@ fs::path WordBankFilePath() {
   return root / "data" / "wordbank.json";
 }
 
-/////////////////////
-// Utility helpers //
-/////////////////////
+// Utility helpers
 
 Player MakeGuestPlayer() {
   Player p;
@@ -119,7 +113,7 @@ bool IsValidUsername(const string& username) {
     return false;
   }
 
-  if (username.size() > 20) {
+  if (username.size() > 10) {
     return false;
   }
 
@@ -134,7 +128,7 @@ bool IsValidUsername(const string& username) {
 }
 
 bool IsValidWord(const string& word) {
-  if ((int)word.size() != WORD_LEN) {
+  if ((int)word.size() != word_len) {
     return false;
   }
 
@@ -155,9 +149,7 @@ string ToUpperWord(string word) {
   return word;
 }
 
-/////////////////////
-// JSON IO helpers //
-/////////////////////
+// JSON IO helpers
 
 vector<Player> LoadPlayers(const fs::path& path = PlayersFilePath()) {
   vector<Player> players;
@@ -307,9 +299,7 @@ void SaveWordBank(const vector<string>& words,
   ofs << j.dump(2) << '\n';
 }
 
-/////////////////////
-// Player helpers  //
-/////////////////////
+// Player helpers 
 
 int FindPlayerIndexByUsername(const vector<Player>& players,
                               const string& username) {
@@ -371,17 +361,15 @@ void SaveCurrentPlayer(Player& currentPlayer, vector<Player>& players) {
   SavePlayers(players);
 }
 
-/////////////////////
-// Game primitives //
-/////////////////////
+// Game primitives
 
 struct Row {
-  array<Tile, WORD_LEN> tiles;
+  array<Tile, word_len> tiles;
 
   Elements RenderTiles() const {
     Elements elems;
 
-    for (int i = 0; i < WORD_LEN; i++) {
+    for (int i = 0; i < word_len; i++) {
       string s(1, tiles[i].ch);
       if (tiles[i].ch == ' ') {
         s = " ";
@@ -449,18 +437,18 @@ string PickDailyWord(const vector<string>& words) {
 void EvaluateGuess(Row& row, string target) {
   string guess = "";
 
-  for (int i = 0; i < WORD_LEN; i++) {
+  for (int i = 0; i < word_len; i++) {
     guess += row.tiles[i].ch;
   }
 
-  for (int i = 0; i < WORD_LEN; i++) {
+  for (int i = 0; i < word_len; i++) {
     if (guess[i] == target[i]) {
       row.tiles[i].state = State::CORRECT;
       target[i] = '_';
     }
   }
 
-  for (int i = 0; i < WORD_LEN; i++) {
+  for (int i = 0; i < word_len; i++) {
     if (row.tiles[i].state == State::CORRECT) {
       continue;
     }
@@ -475,9 +463,7 @@ void EvaluateGuess(Row& row, string target) {
   }
 }
 
-/////////////////////
-// Dialog helpers  //
-/////////////////////
+// Dialog helpers 
 
 void ShowMessageDialog(const string& message) {
   auto screen = ScreenInteractive::Fullscreen();
@@ -645,8 +631,7 @@ bool SingleInputDialog(const string& title,
   return true;
 }
 
-// false = Resume, true = Quit to Menu
-bool ShowQuitConfirmationDialog() {
+bool ShowPauseDialog() {
   auto screen = ScreenInteractive::Fullscreen();
   bool quit = false;
 
@@ -664,7 +649,7 @@ bool ShowQuitConfirmationDialog() {
 
   auto renderer = Renderer(container, [&] {
     return vbox({
-               text("Quit current game?") | bold | center,
+               text("Game Paused.") | bold | center,
                separator(),
                hbox(resume->Render(), separator(), quit_btn->Render()) | center,
            }) |
@@ -675,7 +660,6 @@ bool ShowQuitConfirmationDialog() {
   return quit;
 }
 
-// 0 = Play Again, 1 = Return to Menu
 int ShowAfterGameOptions(bool isGuest,
                          bool isAdmin,
                          const string& username,
@@ -733,9 +717,7 @@ int ShowAfterGameOptions(bool isGuest,
   return choice;
 }
 
-/////////////////////
-// Leaderboard     //
-/////////////////////
+// Leaderboard
 
 void ShowLeaderboardDialog(const vector<Player>& players) {
   auto screen = ScreenInteractive::Fullscreen();
@@ -782,20 +764,18 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
   screen.Loop(renderer);
 }
 
-/////////////////////
-// Word bank admin //
-/////////////////////
+// Word bank admin
 
 void ShowWordBankDialog(vector<string>& wordBank) {
   int page = 0;
 
   while (true) {
     auto screen = ScreenInteractive::Fullscreen();
-    int action = 4;  // default back
+    int action = 4;  
 
     int totalPages = 1;
     if (!wordBank.empty()) {
-      totalPages = ((int)wordBank.size() + WORDS_PER_PAGE - 1) / WORDS_PER_PAGE;
+      totalPages = ((int)wordBank.size() + words_per_page - 1) / words_per_page;
     }
 
     if (page < 0) {
@@ -805,8 +785,8 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       page = totalPages - 1;
     }
 
-    int start = page * WORDS_PER_PAGE;
-    int end = start + WORDS_PER_PAGE;
+    int start = page * words_per_page;
+    int end = start + words_per_page;
     if (end > (int)wordBank.size()) {
       end = (int)wordBank.size();
     }
@@ -946,9 +926,7 @@ void ShowWordBankDialog(vector<string>& wordBank) {
   }
 }
 
-/////////////////////
-// Delete players  //
-/////////////////////
+// Delete players 
 
 void ShowDeletePlayersDialog(vector<Player>& players) {
   int page = 0;
@@ -968,12 +946,12 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
          });
 
     auto screen = ScreenInteractive::Fullscreen();
-    int action = 3;  // back
+    int action = 3; 
 
     int totalPages = 1;
     if (!normalPlayers.empty()) {
       totalPages =
-          ((int)normalPlayers.size() + WORDS_PER_PAGE - 1) / WORDS_PER_PAGE;
+          ((int)normalPlayers.size() + words_per_page - 1) / words_per_page;
     }
 
     if (page < 0) {
@@ -983,8 +961,8 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
       page = totalPages - 1;
     }
 
-    int start = page * WORDS_PER_PAGE;
-    int end = start + WORDS_PER_PAGE;
+    int start = page * words_per_page;
+    int end = start + words_per_page;
     if (end > (int)normalPlayers.size()) {
       end = (int)normalPlayers.size();
     }
@@ -1089,9 +1067,7 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
   }
 }
 
-/////////////////////
-// FTXUI - Game UI //
-/////////////////////
+// FTXUI - Game UI
 
 GameResult RunGameFTXUI(const vector<string>& wordBank,
                         Player& player,
@@ -1113,10 +1089,10 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
     target = PickRandomWord(wordBank);
   }
 
-  array<Row, MAX_ROWS> rows;
+  array<Row, max_rows> rows;
 
-  for (int r = 0; r < MAX_ROWS; r++) {
-    for (int c = 0; c < WORD_LEN; c++) {
+  for (int r = 0; r < max_rows; r++) {
+    for (int c = 0; c < word_len; c++) {
       rows[r].tiles[c].ch = ' ';
       rows[r].tiles[c].state = State::BLANK;
     }
@@ -1131,7 +1107,7 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
 
   auto renderer = Renderer([&] {
     Elements board;
-    for (int r = 0; r < MAX_ROWS; r++) {
+    for (int r = 0; r < max_rows; r++) {
       board.push_back(hbox(rows[r].RenderTiles()) | center);
     }
 
@@ -1181,7 +1157,7 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
     }
 
     if (event == Event::Escape) {
-      bool quit = ShowQuitConfirmationDialog();
+      bool quit = ShowPauseDialog();
       if (quit) {
         result.quitToMenu = true;
         screen.ExitLoopClosure()();
@@ -1189,7 +1165,7 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       return true;
     }
 
-    if (event.is_character() && currentCol < WORD_LEN) {
+    if (event.is_character() && currentCol < word_len) {
       string s = event.character();
 
       if (!s.empty()) {
@@ -1209,9 +1185,9 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       return true;
     }
 
-    if (event == Event::Return && currentCol == WORD_LEN) {
+    if (event == Event::Return && currentCol == word_len) {
       string guess = "";
-      for (int i = 0; i < WORD_LEN; i++) {
+      for (int i = 0; i < word_len; i++) {
         guess += rows[currentRow].tiles[i].ch;
       }
 
@@ -1233,10 +1209,10 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
         currentRow++;
         currentCol = 0;
 
-        if (currentRow >= MAX_ROWS) {
+        if (currentRow >= max_rows) {
           gameOver = true;
           result.won = false;
-          result.attemptsUsed = MAX_ROWS;
+          result.attemptsUsed = max_rows;
           message = "The word was: " + target + ". Press Enter to continue.";
         }
       }
@@ -1263,9 +1239,7 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
   return result;
 }
 
-/////////////////////
-// Session helpers //
-/////////////////////
+// Session helpers 
 
 void PlaySessionLoop(Player& currentPlayer,
                      vector<Player>& players,
@@ -1294,9 +1268,7 @@ void PlaySessionLoop(Player& currentPlayer,
   }
 }
 
-/////////////////////
-// Main loop       //
-/////////////////////
+// Main loop
 
 int main() {
   vector<string> wordBank = LoadWordBank();
