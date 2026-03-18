@@ -49,7 +49,8 @@ struct Tile {
 static const int word_len = 5;
 static const int max_rows = 6;
 static const int words_per_page = 15;
-static const int menu_button_width = 40;
+static const int button_width = 40;
+static const int rules_panel_width = 40;
 
 Element ColoredSubtitleLine(const string& left,
                             const string& middle,
@@ -58,20 +59,19 @@ Element ColoredSubtitleLine(const string& left,
              text(left) | color(Color::Green),
              text(middle) | color(Color::Yellow),
              text(right) | color(Color::Red),
-         }) |
-         bold | center;
+         }) | center;
 }
 
 Element RenderWordleTitle() {
   return vbox({
-             text(" █████   ███   █████                                 █████    ████                                           ") | bold | center,
-             text("▒▒███   ▒███  ▒▒███                                 ▒▒███    ▒▒███                     ███            ███    ") | bold | center,
-             text(" ▒███   ▒███   ▒███      ██████     ████████      ███████     ▒███      ██████        ▒███           ▒███    ") | bold | center,
-             text(" ▒███   ▒███   ▒███     ███▒▒███   ▒▒███▒▒███    ███▒▒███     ▒███     ███▒▒███    ███████████    ███████████") | bold | center,
-             text(" ▒▒███  █████  ███     ▒███ ▒███    ▒███ ▒▒▒    ▒███ ▒███     ▒███    ▒███████    ▒▒▒▒▒███▒▒▒    ▒▒▒▒▒███▒▒▒ ") | bold | center,
-             text("  ▒▒▒█████▒█████▒      ▒███ ▒███    ▒███        ▒███ ▒███     ▒███    ▒███▒▒▒         ▒███           ▒███    ") | bold | center,
-             text("    ▒▒███ ▒▒███        ▒▒██████     █████       ▒▒████████    █████   ▒▒██████        ▒▒▒            ▒▒▒     ") | bold | center,
-             text("     ▒▒▒   ▒▒▒          ▒▒▒▒▒▒     ▒▒▒▒▒         ▒▒▒▒▒▒▒▒    ▒▒▒▒▒     ▒▒▒▒▒▒                                ") | bold | center,
+             text(" █████   ███   █████                                 █████    ████                                           ") | center,
+             text("▒▒███   ▒███  ▒▒███                                 ▒▒███    ▒▒███                     ███            ███    ") | center,
+             text(" ▒███   ▒███   ▒███      ██████     ████████      ███████     ▒███      ██████        ▒███           ▒███    ") | center,
+             text(" ▒███   ▒███   ▒███     ███▒▒███   ▒▒███▒▒███    ███▒▒███     ▒███     ███▒▒███    ███████████    ███████████") | center,
+             text(" ▒▒███  █████  ███     ▒███ ▒███    ▒███ ▒▒▒    ▒███ ▒███     ▒███    ▒███████    ▒▒▒▒▒███▒▒▒    ▒▒▒▒▒███▒▒▒ ") | center,
+             text("  ▒▒▒█████▒█████▒      ▒███ ▒███    ▒███        ▒███ ▒███     ▒███    ▒███▒▒▒         ▒███           ▒███    ") | center,
+             text("    ▒▒███ ▒▒███        ▒▒██████     █████       ▒▒████████    █████   ▒▒██████        ▒▒▒            ▒▒▒     ") | center,
+             text("     ▒▒▒   ▒▒▒          ▒▒▒▒▒▒     ▒▒▒▒▒         ▒▒▒▒▒▒▒▒    ▒▒▒▒▒     ▒▒▒▒▒▒                                ") | center,
              text("") | size(HEIGHT, EQUAL, 1),
              text("") | size(HEIGHT, EQUAL, 1),
 
@@ -533,7 +533,12 @@ bool LoginDialog(string& username, string& password) {
   bool submitted = false;
 
   auto username_input = Input(&username, "username");
-  auto password_input = Input(&password, "password");
+  InputOption password_option;
+  password_option.content = &password;
+  password_option.placeholder = "password";
+  password_option.password = true;
+  password_option.multiline = false;
+  auto password_input = Input(password_option);
 
   auto login = Button("Log in", [&] {
     submitted = true;
@@ -583,7 +588,12 @@ bool SignupDialog(string& username, string& password) {
   bool submitted = false;
 
   auto username_input = Input(&username, "username");
-  auto password_input = Input(&password, "password");
+  InputOption password_option;
+  password_option.content = &password;
+  password_option.placeholder = "password";
+  password_option.password = true;
+  password_option.multiline = false;
+  auto password_input = Input(password_option);
 
   auto create = Button("Create", [&] {
     submitted = true;
@@ -796,7 +806,10 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
 
   auto renderer = Renderer(back, [&] {
     return vbox({
-               text("Leaderboard") | bold | center,
+               text("██     ▄▄▄▄▄  ▄▄▄  ▄▄▄▄  ▄▄▄▄▄ ▄▄▄▄  ▄▄▄▄   ▄▄▄   ▄▄▄  ▄▄▄▄  ▄▄▄▄  ") | center,
+               text("██     ██▄▄  ██▀██ ██▀██ ██▄▄  ██▄█▄ ██▄██ ██▀██ ██▀██ ██▄█▄ ██▀██ ") | center,
+               text("██████ ██▄▄▄ ██▀██ ████▀ ██▄▄▄ ██ ██ ██▄█▀ ▀███▀ ██▀██ ██ ██ ████▀ ") | center,
+               text(""),
                separator(),
                vbox(lines) | center,
                separator(),
@@ -877,7 +890,9 @@ void ShowWordBankDialog(vector<string>& wordBank) {
 
     auto renderer = Renderer(container, [&] {
       return vbox({
-                 text("Word Bank") | bold | center,
+                 text("██     ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄    █████▄  ▄▄▄  ▄▄  ▄▄ ▄▄ ▄▄ ") | center,
+                 text("██ ▄█▄ ██ ██▀██ ██▄█▄ ██▀██   ██▄▄██ ██▀██ ███▄██ ██▄█▀ ") | center,
+                 text(" ▀██▀██▀  ▀███▀ ██ ██ ████▀   ██▄▄█▀ ██▀██ ██ ▀██ ██ ██ ") | center,
                  separator(),
                  text("Page " + to_string(page + 1) + " / " +
                       to_string(totalPages)) |
@@ -1050,7 +1065,9 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
 
     auto renderer = Renderer(container, [&] {
       return vbox({
-                 text("Delete Players") | bold | center,
+                 text("████▄  ▄▄▄▄▄ ▄▄    ▄▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄▄▄   █████▄ ▄▄     ▄▄▄  ▄▄ ▄▄ ▄▄▄▄▄ ▄▄▄▄ ") | center,
+                 text("██  ██ ██▄▄  ██    ██▄▄    ██   ██▄▄    ██▄▄█▀ ██    ██▀██ ▀███▀ ██▄▄  ██▄█▄") | center,
+                 text("████▀  ██▄▄▄ ██▄▄▄ ██▄▄▄   ██   ██▄▄▄   ██     ██▄▄▄ ██▀██   █   ██▄▄▄ ██ ██ ") | center,
                  separator(),
                  text("Page " + to_string(page + 1) + " / " +
                       to_string(totalPages)) |
@@ -1180,12 +1197,34 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       info.push_back(text("Target word: " + target) | bold | center);
     }
 
-    return vbox({
-               vbox(info) | center,
-               separator(),
-               vbox(board) | center,
-               separator(),
-               text(message) | center,
+    Element rulesPanel = vbox({
+                             text("RULES") | bold | center,
+                             separator(),
+                             text("Guess the 5-letter word") | center,
+                             text("in 6 tries or less!") | center,
+                             text("") | size(HEIGHT, EQUAL, 1),
+                             text("Green  = right letter, right spot") | center,
+                             text("Yellow = right letter, wrong spot") | center,
+                             text("Red    = letter not in word") | center,
+                             text("") | size(HEIGHT, EQUAL, 1),
+                             text("Esc = pause") | center,
+                         }) |
+                         border;
+
+    Element boardPanel = vbox({
+                             vbox(info) | center,
+                             separator(),
+                             vbox(board) | center,
+                             separator(),
+                             text(message) | center,
+                         }) |
+                         border;
+
+    return hbox({
+               text("") | size(WIDTH, EQUAL, rules_panel_width),
+               boardPanel | flex,
+               text("") | size(WIDTH, EQUAL, 15),
+               rulesPanel | size(WIDTH, EQUAL, rules_panel_width),
            }) |
            center;
   });
@@ -1323,35 +1362,35 @@ int main() {
     auto screen = ScreenInteractive::Fullscreen();
 
     if (currentPlayer.isGuest) {
-      auto login_btn = Button("Login", [&] {
+      auto login_btn = Button("🔑 Log in", [&] {
         menu_choice = 0;
         screen.ExitLoopClosure()();
       });
 
-      auto signup_btn = Button("Sign Up", [&] {
+      auto signup_btn = Button("📝 Sign up", [&] {
         menu_choice = 1;
         screen.ExitLoopClosure()();
       });
 
-      auto guest_btn = Button("Play as Guest", [&] {
+      auto guest_btn = Button("🎮 Play as Guest", [&] {
         menu_choice = 2;
         screen.ExitLoopClosure()();
       });
 
-      auto leaderboard_btn = Button("Leaderboard", [&] {
+      auto leaderboard_btn = Button("🏆 Leaderboard", [&] {
         menu_choice = 3;
         screen.ExitLoopClosure()();
       });
 
-      auto exit_btn = Button("Exit", [&] {
+      auto exit_btn = Button("🚪 Exit", [&] {
         menu_choice = 4;
         screen.ExitLoopClosure()();
       });
 
       auto menu = Container::Vertical({
+          guest_btn,
           login_btn,
           signup_btn,
-          guest_btn,
           leaderboard_btn,
           exit_btn,
       });
@@ -1362,12 +1401,13 @@ int main() {
                    text("Not logged in") | center,
                    text("") | size(HEIGHT, EQUAL, 1),
                    vbox({
-                       login_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
-                       signup_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
-                       guest_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       guest_btn->Render() | size(WIDTH, EQUAL, button_width),
+                       text("or") | bold | center,
+                       login_btn->Render() | size(WIDTH, EQUAL, button_width),
+                       signup_btn->Render() | size(WIDTH, EQUAL, button_width),
                        leaderboard_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
-                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, button_width),
                    }) |
                        center,
                }) |
@@ -1449,37 +1489,37 @@ int main() {
       }
 
     } else if (currentPlayer.isAdmin) {
-      auto play_btn = Button("Play", [&] {
+      auto play_btn = Button("🎮 Play", [&] {
         menu_choice = 10;
         screen.ExitLoopClosure()();
       });
 
-      auto daily_btn = Button("Play Daily Mode", [&] {
+      auto daily_btn = Button("📆 Play Daily Mode", [&] {
         menu_choice = 11;
         screen.ExitLoopClosure()();
       });
 
-      auto word_bank_btn = Button("Word Bank", [&] {
+      auto word_bank_btn = Button("🗃️  Word Bank", [&] {
         menu_choice = 12;
         screen.ExitLoopClosure()();
       });
 
-      auto delete_players_btn = Button("Delete Player", [&] {
+      auto delete_players_btn = Button("➖ Delete Player", [&] {
         menu_choice = 13;
         screen.ExitLoopClosure()();
       });
 
-      auto leaderboard_btn = Button("Leaderboard", [&] {
+      auto leaderboard_btn = Button("🏆 Leaderboard", [&] {
         menu_choice = 14;
         screen.ExitLoopClosure()();
       });
 
-      auto logout_btn = Button("Log Out", [&] {
+      auto logout_btn = Button("🔐 Log Out", [&] {
         menu_choice = 15;
         screen.ExitLoopClosure()();
       });
 
-      auto exit_btn = Button("Exit", [&] {
+      auto exit_btn = Button("🚪 Exit", [&] {
         menu_choice = 16;
         screen.ExitLoopClosure()();
       });
@@ -1501,18 +1541,18 @@ int main() {
                    text("Logged in as: admin") | bold | center,
                    text("") | size(HEIGHT, EQUAL, 1),
                    vbox({
-                       play_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       play_btn->Render() | size(WIDTH, EQUAL, button_width),
                        daily_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        word_bank_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        delete_players_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        leaderboard_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        logout_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
-                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, button_width),
                    }) |
                        center,
                }) |
@@ -1544,27 +1584,27 @@ int main() {
       }
 
     } else {
-      auto play_btn = Button("Play", [&] {
+      auto play_btn = Button("🎮 Play", [&] {
         menu_choice = 20;
         screen.ExitLoopClosure()();
       });
 
-      auto daily_btn = Button("Play Daily Mode", [&] {
+      auto daily_btn = Button("📆 Play Daily Mode", [&] {
         menu_choice = 21;
         screen.ExitLoopClosure()();
       });
 
-      auto leaderboard_btn = Button("Leaderboard", [&] {
+      auto leaderboard_btn = Button("🏆 Leaderboard", [&] {
         menu_choice = 22;
         screen.ExitLoopClosure()();
       });
 
-      auto logout_btn = Button("Log Out", [&] {
+      auto logout_btn = Button("🔐 Log Out", [&] {
         menu_choice = 23;
         screen.ExitLoopClosure()();
       });
 
-      auto exit_btn = Button("Exit", [&] {
+      auto exit_btn = Button("🚪 Exit", [&] {
         menu_choice = 24;
         screen.ExitLoopClosure()();
       });
@@ -1585,14 +1625,14 @@ int main() {
                        center,
                    text("") | size(HEIGHT, EQUAL, 1),
                    vbox({
-                       play_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       play_btn->Render() | size(WIDTH, EQUAL, button_width),
                        daily_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        leaderboard_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        logout_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
-                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, button_width),
                    }) |
                        center,
                }) |
