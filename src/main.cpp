@@ -50,7 +50,9 @@ static const int word_len = 5;
 static const int max_rows = 6;
 static const int words_per_page = 15;
 static const int button_width = 40;
-static const int rules_panel_width = 40;
+static const int rules_box_width = 40;
+static const int rules_box_gap = 20;
+
 
 Element ColoredSubtitleLine(const string& left,
                             const string& middle,
@@ -558,11 +560,13 @@ bool LoginDialog(string& username, string& password) {
 
   auto renderer = Renderer(form, [&] {
     return vbox({
-               text("Login") | bold | center,
+               text("Log In") | bold | center,
                separator(),
-               hbox(text("Username: "), username_input->Render()) | center,
-               hbox(text("Password: "), password_input->Render()) | center,
-               hbox(login->Render(), separator(), cancel->Render()) | center,
+               hbox(text("Username: ") | bold, username_input->Render()) | center,
+               text("") | size(HEIGHT, EQUAL, 1),
+               hbox(text("Password: ") | bold, password_input->Render()) | center,
+               separator(),
+               hbox(login->Render(), cancel->Render()) | center,
            }) |
            center | border;
   });
@@ -615,9 +619,11 @@ bool SignupDialog(string& username, string& password) {
     return vbox({
                text("Sign Up") | bold | center,
                separator(),
-               hbox(text("Username: "), username_input->Render()) | center,
-               hbox(text("Password: "), password_input->Render()) | center,
-               hbox(create->Render(), separator(), cancel->Render()) | center,
+               hbox(text("Username: ") | bold, username_input->Render()) | center,
+               text("") | size(HEIGHT, EQUAL, 1),
+               hbox(text("Password: ") | bold, password_input->Render()) | center,
+               separator(),
+               hbox(create->Render(), cancel->Render()) | center,
            }) |
            center | border;
   });
@@ -734,11 +740,11 @@ int ShowAfterGameOptions(bool isGuest,
 
   string sessionLabel = "";
   if (isGuest) {
-    sessionLabel = "Guest session finished";
+    sessionLabel = "Game finished for Guest";
   } else if (isAdmin) {
-    sessionLabel = "Admin session finished";
+    sessionLabel = "Game finished for Admin";
   } else {
-    sessionLabel = "Session finished for: " + username;
+    sessionLabel = "Game finished for: " + username;
   }
 
   string resultLabel = "";
@@ -1197,21 +1203,21 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       info.push_back(text("Target word: " + target) | bold | center);
     }
 
-    Element rulesPanel = vbox({
+    Element rulesBox = vbox({
                              text("RULES") | bold | center,
                              separator(),
-                             text("Guess the 5-letter word") | center,
-                             text("in 6 tries or less!") | center,
+                             text("Guess the 5-letter word!") | center,
+                             text("You have 6 tries!") | center,
                              text("") | size(HEIGHT, EQUAL, 1),
                              text("Green  = right letter, right spot") | center,
                              text("Yellow = right letter, wrong spot") | center,
                              text("Red    = letter not in word") | center,
                              text("") | size(HEIGHT, EQUAL, 1),
-                             text("Esc = pause") | center,
+                             text("ESC = pause") | center,
                          }) |
                          border;
 
-    Element boardPanel = vbox({
+    Element boardBox = vbox({
                              vbox(info) | center,
                              separator(),
                              vbox(board) | center,
@@ -1220,11 +1226,16 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
                          }) |
                          border;
 
+    Element rulesColumn = vbox({
+                             rulesBox | size(WIDTH, EQUAL, rules_box_width),
+                             filler(),
+                         });
+
     return hbox({
-               text("") | size(WIDTH, EQUAL, rules_panel_width),
-               boardPanel | flex,
-               text("") | size(WIDTH, EQUAL, 15),
-               rulesPanel | size(WIDTH, EQUAL, rules_panel_width),
+               text("") | size(WIDTH, EQUAL, rules_box_width),
+               boardBox | flex,
+               text("") | size(WIDTH, EQUAL, rules_box_gap),
+               rulesColumn,
            }) |
            center;
   });

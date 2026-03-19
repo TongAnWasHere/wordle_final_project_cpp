@@ -2,8 +2,14 @@
   "players": [
     {
       "password": "abc123",
-      "streak": 8,
+      "streak": 1,
       "username": "Tongan",
+      "wins": 8
+    },
+    {
+      "password": "abc123",
+      "streak": 0,
+      "username": "test1",
       "wins": 0
     },
     {
