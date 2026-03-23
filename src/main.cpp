@@ -1123,6 +1123,7 @@ void ShowWordBankDialog(vector<string>& wordBank, int wordLength) {
                  text("██     ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄    █████▄  ▄▄▄  ▄▄  ▄▄ ▄▄ ▄▄ ") | center,
                  text("██ ▄█▄ ██ ██▀██ ██▄█▄ ██▀██   ██▄▄██ ██▀██ ███▄██ ██▄█▀ ") | center,
                  text(" ▀██▀██▀  ▀███▀ ██ ██ ████▀   ██▄▄█▀ ██▀██ ██ ▀██ ██ ██ ") | center,
+                 VerticalSpacer(screen_section_spacer_height),
                  separator(),
                  text("Page " + to_string(page + 1) + " / " +
                       to_string(totalPages)) |
@@ -1299,6 +1300,7 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
                  text("████▄  ▄▄▄▄▄ ▄▄    ▄▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄▄▄   █████▄ ▄▄     ▄▄▄  ▄▄ ▄▄ ▄▄▄▄▄ ▄▄▄▄ ") | center,
                  text("██  ██ ██▄▄  ██    ██▄▄    ██   ██▄▄    ██▄▄█▀ ██    ██▀██ ▀███▀ ██▄▄  ██▄█▄") | center,
                  text("████▀  ██▄▄▄ ██▄▄▄ ██▄▄▄   ██   ██▄▄▄   ██     ██▄▄▄ ██▀██   █   ██▄▄▄ ██ ██ ") | center,
+                 VerticalSpacer(screen_section_spacer_height),
                  separator(),
                  text("Page " + to_string(page + 1) + " / " +
                       to_string(totalPages)) |
@@ -1440,9 +1442,9 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
                                  center,
                              text("You have 6 tries!") | center,
                              VerticalSpacer(rules_spacer_height),
-                             text("Green  = right letter, right spot") | center,
+                             text("Green = right letter, right spot") | center,
                              text("Yellow = right letter, wrong spot") | center,
-                             text("Red    = letter not in word") | center,
+                             text("Red = letter not in word") | center,
                              VerticalSpacer(rules_spacer_height),
                              text("ESC = pause") | center,
                          }) |
