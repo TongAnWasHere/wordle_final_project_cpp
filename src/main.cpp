@@ -46,10 +46,54 @@ struct Tile {
   State state;
 };
 
-static const int word_len = 5;
+static const int project_root_search_depth = 8;
+static const int json_indent_spaces = 2;
+static const int default_stat_value = 0;
+static const int max_username_length = 10;
+static const int title_spacer_height = 1;
+static const int screen_section_spacer_height = 1;
 static const int max_rows = 6;
+static const int leaderboard_entries_to_show = 5;
 static const int words_per_page = 15;
-static const int menu_button_width = 40;
+static const int button_width = 40;
+static const int rules_box_width = 40;
+static const int rules_box_gap = 20;
+static const int dialog_min_width = 30;
+static const int dialog_outer_padding_height = 0;
+static const int dialog_inner_padding_height = 1;
+static const int dialog_button_gap_width = 3;
+static const int rules_spacer_height = 1;
+static const int tile_width = 7;
+static const int tile_height = 3;
+static const int tile_border_width = 2;
+static const int game_box_side_padding = 4;
+
+static const string guest_username = "Guest";
+static const string admin_username = "admin";
+static const string admin_password = "admin123";
+
+static const string button_back = "Back";
+static const string button_cancel = "Cancel";
+static const string button_continue = "Continue";
+static const string button_previous = "Previous";
+static const string button_next = "Next";
+static const string button_play_again = "Play Again";
+static const string button_return_to_menu = "Return to Menu";
+
+Element VerticalSpacer(int height) {
+  return text("") | size(HEIGHT, EQUAL, height);
+}
+
+Element HorizontalSpacer(int width) {
+  return text("") | size(WIDTH, EQUAL, width);
+}
+
+int GetGameBoxWidth(int wordLength) {
+  int tileOuterWidth = tile_width + tile_border_width;
+  int boardRowWidth = wordLength * tileOuterWidth;
+  int boardInnerWidth = boardRowWidth + game_box_side_padding * 2;
+  return boardInnerWidth + 2;
+}
 
 Element ColoredSubtitleLine(const string& left,
                             const string& middle,
@@ -58,22 +102,21 @@ Element ColoredSubtitleLine(const string& left,
              text(left) | color(Color::Green),
              text(middle) | color(Color::Yellow),
              text(right) | color(Color::Red),
-         }) |
-         bold | center;
+         }) | center;
 }
 
 Element RenderWordleTitle() {
   return vbox({
-             text(" █████   ███   █████                                 █████    ████                                           ") | bold | center,
-             text("▒▒███   ▒███  ▒▒███                                 ▒▒███    ▒▒███                     ███            ███    ") | bold | center,
-             text(" ▒███   ▒███   ▒███      ██████     ████████      ███████     ▒███      ██████        ▒███           ▒███    ") | bold | center,
-             text(" ▒███   ▒███   ▒███     ███▒▒███   ▒▒███▒▒███    ███▒▒███     ▒███     ███▒▒███    ███████████    ███████████") | bold | center,
-             text(" ▒▒███  █████  ███     ▒███ ▒███    ▒███ ▒▒▒    ▒███ ▒███     ▒███    ▒███████    ▒▒▒▒▒███▒▒▒    ▒▒▒▒▒███▒▒▒ ") | bold | center,
-             text("  ▒▒▒█████▒█████▒      ▒███ ▒███    ▒███        ▒███ ▒███     ▒███    ▒███▒▒▒         ▒███           ▒███    ") | bold | center,
-             text("    ▒▒███ ▒▒███        ▒▒██████     █████       ▒▒████████    █████   ▒▒██████        ▒▒▒            ▒▒▒     ") | bold | center,
-             text("     ▒▒▒   ▒▒▒          ▒▒▒▒▒▒     ▒▒▒▒▒         ▒▒▒▒▒▒▒▒    ▒▒▒▒▒     ▒▒▒▒▒▒                                ") | bold | center,
-             text("") | size(HEIGHT, EQUAL, 1),
-             text("") | size(HEIGHT, EQUAL, 1),
+             text(" █████   ███   █████                                 █████    ████                                           ") | center,
+             text("▒▒███   ▒███  ▒▒███                                 ▒▒███    ▒▒███                     ███            ███    ") | center,
+             text(" ▒███   ▒███   ▒███      ██████     ████████      ███████     ▒███      ██████        ▒███           ▒███    ") | center,
+             text(" ▒███   ▒███   ▒███     ███▒▒███   ▒▒███▒▒███    ███▒▒███     ▒███     ███▒▒███    ███████████    ███████████") | center,
+             text(" ▒▒███  █████  ███     ▒███ ▒███    ▒███ ▒▒▒    ▒███ ▒███     ▒███    ▒███████    ▒▒▒▒▒███▒▒▒    ▒▒▒▒▒███▒▒▒ ") | center,
+             text("  ▒▒▒█████▒█████▒      ▒███ ▒███    ▒███        ▒███ ▒███     ▒███    ▒███▒▒▒         ▒███           ▒███    ") | center,
+             text("    ▒▒███ ▒▒███        ▒▒██████     █████       ▒▒████████    █████   ▒▒██████        ▒▒▒            ▒▒▒     ") | center,
+             text("     ▒▒▒   ▒▒▒          ▒▒▒▒▒▒     ▒▒▒▒▒         ▒▒▒▒▒▒▒▒    ▒▒▒▒▒     ▒▒▒▒▒▒                                ") | center,
+             VerticalSpacer(title_spacer_height),
+             VerticalSpacer(title_spacer_height),
 
              ColoredSubtitleLine(
                  "██     ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄     ",
@@ -90,7 +133,7 @@ Element RenderWordleTitle() {
                  " ▀███▀  ▀███▀ ██▄▄▄ ▄▄██▀ ▄▄██▀ ██ ██ ▀██ ▀███▀   ",
                  " ▀███▀  ██▀██ ██   ██ ██▄▄▄ "),
 
-             text("") | size(HEIGHT, EQUAL, 1),
+             VerticalSpacer(title_spacer_height),
          });
 }
 
@@ -99,12 +142,15 @@ Element RenderWordleTitle() {
 fs::path FindProjectRoot() {
   fs::path current = fs::current_path();
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < project_root_search_depth; i++) {
     if (fs::exists(current / "CMakeLists.txt")) {
       return current;
     }
 
-    if (fs::exists(current / "data" / "wordbank.json")) {
+    if (fs::exists(current / "data" / "wordbank_3.json") ||
+        fs::exists(current / "data" / "wordbank_5.json") ||
+        fs::exists(current / "data" / "wordbank_6.json") ||
+        fs::exists(current / "data" / "wordbank.json")) {
       return current;
     }
 
@@ -123,19 +169,37 @@ fs::path PlayersFilePath() {
   return root / "data" / "players.json";
 }
 
-fs::path WordBankFilePath() {
+fs::path LegacyWordBankFilePath() {
   fs::path root = FindProjectRoot();
   return root / "data" / "wordbank.json";
+}
+
+fs::path WordBankFilePath(int wordLength) {
+  fs::path root = FindProjectRoot();
+  return root / "data" / ("wordbank_" + to_string(wordLength) + ".json");
+}
+
+string WordPlaceholder(int wordLength) {
+  return to_string(wordLength) + "-letter word";
+}
+
+string WordRequirementMessage(int wordLength) {
+  return "Word must be exactly " + to_string(wordLength) + " letters.";
+}
+
+string DailyWordBankEmptyMessage() {
+  return "The " + to_string(5) +
+         "-letter word bank is empty.";
 }
 
 // Utility helpers
 
 Player MakeGuestPlayer() {
   Player p;
-  p.username = "Guest";
+  p.username = guest_username;
   p.password = "";
-  p.wins = 0;
-  p.streak = 0;
+  p.wins = default_stat_value;
+  p.streak = default_stat_value;
   p.isGuest = true;
   p.isAdmin = false;
   return p;
@@ -143,10 +207,10 @@ Player MakeGuestPlayer() {
 
 Player MakeAdminPlayer() {
   Player p;
-  p.username = "admin";
-  p.password = "admin123";
-  p.wins = 0;
-  p.streak = 0;
+  p.username = admin_username;
+  p.password = admin_password;
+  p.wins = default_stat_value;
+  p.streak = default_stat_value;
   p.isGuest = false;
   p.isAdmin = true;
   return p;
@@ -157,7 +221,7 @@ bool IsValidUsername(const string& username) {
     return false;
   }
 
-  if (username.size() > 10) {
+  if (username.size() > max_username_length) {
     return false;
   }
 
@@ -171,8 +235,8 @@ bool IsValidUsername(const string& username) {
   return true;
 }
 
-bool IsValidWord(const string& word) {
-  if ((int)word.size() != word_len) {
+bool IsValidWord(const string& word, int wordLength) {
+  if ((int)word.size() != wordLength) {
     return false;
   }
 
@@ -268,10 +332,10 @@ void SavePlayers(const vector<Player>& players,
     return;
   }
 
-  ofs << j.dump(2) << '\n';
+  ofs << j.dump(json_indent_spaces) << '\n';
 }
 
-vector<string> LoadWordBank(const fs::path& path = WordBankFilePath()) {
+vector<string> LoadWordBankFromPath(const fs::path& path, int wordLength) {
   vector<string> words;
 
   if (!fs::exists(path)) {
@@ -310,7 +374,7 @@ vector<string> LoadWordBank(const fs::path& path = WordBankFilePath()) {
     string word = j["words"][i].get<string>();
     word = ToUpperWord(word);
 
-    if (IsValidWord(word)) {
+    if (IsValidWord(word, wordLength)) {
       words.push_back(word);
     }
   }
@@ -321,8 +385,17 @@ vector<string> LoadWordBank(const fs::path& path = WordBankFilePath()) {
   return words;
 }
 
-void SaveWordBank(const vector<string>& words,
-                  const fs::path& path = WordBankFilePath()) {
+vector<string> LoadWordBank(int wordLength) {
+  fs::path path = WordBankFilePath(wordLength);
+
+  if (wordLength == 5 && !fs::exists(path)) {
+    return LoadWordBankFromPath(LegacyWordBankFilePath(), wordLength);
+  }
+
+  return LoadWordBankFromPath(path, wordLength);
+}
+
+void SaveWordBank(const vector<string>& words, int wordLength) {
   vector<string> sortedWords = words;
   sort(sortedWords.begin(), sortedWords.end());
   sortedWords.erase(unique(sortedWords.begin(), sortedWords.end()),
@@ -335,12 +408,12 @@ void SaveWordBank(const vector<string>& words,
     j["words"].push_back(sortedWords[i]);
   }
 
-  ofstream ofs(path);
+  ofstream ofs(WordBankFilePath(wordLength));
   if (!ofs) {
     return;
   }
 
-  ofs << j.dump(2) << '\n';
+  ofs << j.dump(json_indent_spaces) << '\n';
 }
 
 // Player helpers 
@@ -356,7 +429,7 @@ int FindPlayerIndexByUsername(const vector<Player>& players,
 }
 
 bool UsernameTaken(const vector<Player>& players, const string& username) {
-  if (username == "admin") {
+  if (username == admin_username) {
     return true;
   }
 
@@ -408,12 +481,16 @@ void SaveCurrentPlayer(Player& currentPlayer, vector<Player>& players) {
 // Game primitives
 
 struct Row {
-  array<Tile, word_len> tiles;
+  vector<Tile> tiles;
+
+  Row() = default;
+
+  explicit Row(int wordLength) : tiles(wordLength) {}
 
   Elements RenderTiles() const {
     Elements elems;
 
-    for (int i = 0; i < word_len; i++) {
+    for (int i = 0; i < (int)tiles.size(); i++) {
       string s(1, tiles[i].ch);
       if (tiles[i].ch == ' ') {
         s = " ";
@@ -429,8 +506,8 @@ struct Row {
         bg = Color::Red;
       }
 
-      elems.push_back(text(s) | bold | center | size(WIDTH, EQUAL, 7) |
-                      size(HEIGHT, EQUAL, 3) | bgcolor(bg) |
+      elems.push_back(text(s) | bold | center | size(WIDTH, EQUAL, tile_width) |
+                      size(HEIGHT, EQUAL, tile_height) | bgcolor(bg) |
                       color(Color::White) | borderEmpty);
     }
 
@@ -478,21 +555,21 @@ string PickDailyWord(const vector<string>& words) {
   return words[index];
 }
 
-void EvaluateGuess(Row& row, string target) {
+void EvaluateGuess(Row& row, string target, int wordLength) {
   string guess = "";
 
-  for (int i = 0; i < word_len; i++) {
+  for (int i = 0; i < wordLength; i++) {
     guess += row.tiles[i].ch;
   }
 
-  for (int i = 0; i < word_len; i++) {
+  for (int i = 0; i < wordLength; i++) {
     if (guess[i] == target[i]) {
       row.tiles[i].state = State::CORRECT;
       target[i] = '_';
     }
   }
 
-  for (int i = 0; i < word_len; i++) {
+  for (int i = 0; i < wordLength; i++) {
     if (row.tiles[i].state == State::CORRECT) {
       continue;
     }
@@ -511,15 +588,19 @@ void EvaluateGuess(Row& row, string target) {
 
 void ConfirmationDialog(const string& message) {
   auto screen = ScreenInteractive::Fullscreen();
-  auto okay = Button("Continue", screen.ExitLoopClosure());
+  auto okay = Button(button_continue, screen.ExitLoopClosure());
 
   auto renderer = Renderer(okay, [&] {
-    return vbox({
-               text(message) | center,
-               separator(),
-               okay->Render() | center,
-           }) |
-           center | border;
+    Element dialogBox = vbox({
+                            VerticalSpacer(dialog_outer_padding_height),
+                            text(message) | center,
+                            separator(),
+                            okay->Render() | center,
+                            VerticalSpacer(dialog_outer_padding_height),
+                        }) |
+                        border | size(WIDTH, GREATER_THAN, dialog_min_width);
+
+    return dialogBox | center;
   });
 
   screen.Loop(renderer);
@@ -533,14 +614,19 @@ bool LoginDialog(string& username, string& password) {
   bool submitted = false;
 
   auto username_input = Input(&username, "username");
-  auto password_input = Input(&password, "password");
+  InputOption password_option;
+  password_option.content = &password;
+  password_option.placeholder = "password";
+  password_option.password = true;
+  password_option.multiline = false;
+  auto password_input = Input(password_option);
 
   auto login = Button("Log in", [&] {
     submitted = true;
     screen.ExitLoopClosure()();
   });
 
-  auto cancel = Button("Cancel", [&] {
+  auto cancel = Button(button_cancel, [&] {
     submitted = false;
     screen.ExitLoopClosure()();
   });
@@ -552,14 +638,29 @@ bool LoginDialog(string& username, string& password) {
   });
 
   auto renderer = Renderer(form, [&] {
-    return vbox({
-               text("Login") | bold | center,
-               separator(),
-               hbox(text("Username: "), username_input->Render()) | center,
-               hbox(text("Password: "), password_input->Render()) | center,
-               hbox(login->Render(), separator(), cancel->Render()) | center,
-           }) |
-           center | border;
+    Element formBox = vbox({
+                          VerticalSpacer(dialog_outer_padding_height),
+                          text("Log In") | bold | center,
+                          separator(),
+                          VerticalSpacer(dialog_inner_padding_height),
+                          hbox(text("Username: ") | bold,
+                               username_input->Render()) |
+                              center,
+                          VerticalSpacer(dialog_inner_padding_height),
+                          hbox(text("Password: ") | bold,
+                               password_input->Render()) |
+                              center,
+                          VerticalSpacer(dialog_inner_padding_height),
+                          separator(),
+                          hbox(login->Render(),
+                               HorizontalSpacer(dialog_button_gap_width),
+                               cancel->Render()) |
+                              center,
+                          VerticalSpacer(dialog_outer_padding_height),
+                      }) |
+                      border | size(WIDTH, GREATER_THAN, dialog_min_width);
+
+    return formBox | center;
   });
 
   screen.Loop(renderer);
@@ -583,14 +684,19 @@ bool SignupDialog(string& username, string& password) {
   bool submitted = false;
 
   auto username_input = Input(&username, "username");
-  auto password_input = Input(&password, "password");
+  InputOption password_option;
+  password_option.content = &password;
+  password_option.placeholder = "password";
+  password_option.password = true;
+  password_option.multiline = false;
+  auto password_input = Input(password_option);
 
   auto create = Button("Create", [&] {
     submitted = true;
     screen.ExitLoopClosure()();
   });
 
-  auto cancel = Button("Cancel", [&] {
+  auto cancel = Button(button_cancel, [&] {
     submitted = false;
     screen.ExitLoopClosure()();
   });
@@ -602,14 +708,29 @@ bool SignupDialog(string& username, string& password) {
   });
 
   auto renderer = Renderer(form, [&] {
-    return vbox({
-               text("Sign Up") | bold | center,
-               separator(),
-               hbox(text("Username: "), username_input->Render()) | center,
-               hbox(text("Password: "), password_input->Render()) | center,
-               hbox(create->Render(), separator(), cancel->Render()) | center,
-           }) |
-           center | border;
+    Element formBox = vbox({
+                          VerticalSpacer(dialog_outer_padding_height),
+                          text("Sign Up") | bold | center,
+                          separator(),
+                          VerticalSpacer(dialog_inner_padding_height),
+                          hbox(text("Username: ") | bold,
+                               username_input->Render()) |
+                              center,
+                          VerticalSpacer(dialog_inner_padding_height),
+                          hbox(text("Password: ") | bold,
+                               password_input->Render()) |
+                              center,
+                          VerticalSpacer(dialog_inner_padding_height),
+                          separator(),
+                          hbox(create->Render(),
+                               HorizontalSpacer(dialog_button_gap_width),
+                               cancel->Render()) |
+                              center,
+                          VerticalSpacer(dialog_outer_padding_height),
+                      }) |
+                      border | size(WIDTH, GREATER_THAN, dialog_min_width);
+
+    return formBox | center;
   });
 
   screen.Loop(renderer);
@@ -642,7 +763,7 @@ bool SingleInputDialog(const string& title,
     screen.ExitLoopClosure()();
   });
 
-  auto cancel = Button("Cancel", [&] {
+  auto cancel = Button(button_cancel, [&] {
     submitted = false;
     screen.ExitLoopClosure()();
   });
@@ -653,13 +774,23 @@ bool SingleInputDialog(const string& title,
   });
 
   auto renderer = Renderer(form, [&] {
-    return vbox({
-               text(title) | bold | center,
-               separator(),
-               hbox(text(label), input->Render()) | center,
-               hbox(confirm->Render(), separator(), cancel->Render()) | center,
-           }) |
-           center | border;
+    Element dialogBox = vbox({
+                            VerticalSpacer(dialog_outer_padding_height),
+                            text(title) | bold | center,
+                            separator(),
+                            VerticalSpacer(dialog_inner_padding_height),
+                            hbox(text(label), input->Render()) | center,
+                            VerticalSpacer(dialog_inner_padding_height),
+                            separator(),
+                            hbox(confirm->Render(),
+                                 HorizontalSpacer(dialog_button_gap_width),
+                                 cancel->Render()) |
+                                center,
+                            VerticalSpacer(dialog_outer_padding_height),
+                        }) |
+                        border | size(WIDTH, GREATER_THAN, dialog_min_width);
+
+    return dialogBox | center;
   });
 
   screen.Loop(renderer);
@@ -692,12 +823,19 @@ bool ShowPauseDialog() {
   auto container = Container::Horizontal({resume, quit_btn});
 
   auto renderer = Renderer(container, [&] {
-    return vbox({
-               text("Game Paused.") | bold | center,
-               separator(),
-               hbox(resume->Render(), separator(), quit_btn->Render()) | center,
-           }) |
-           center | border;
+    Element dialogBox = vbox({
+                            VerticalSpacer(dialog_outer_padding_height),
+                            text("Game Paused.") | bold | center,
+                            separator(),
+                            hbox(resume->Render(),
+                                 HorizontalSpacer(dialog_button_gap_width),
+                                 quit_btn->Render()) |
+                                center,
+                            VerticalSpacer(dialog_outer_padding_height),
+                        }) |
+                        border | size(WIDTH, GREATER_THAN, dialog_min_width);
+
+    return dialogBox | center;
   });
 
   screen.Loop(renderer);
@@ -712,23 +850,23 @@ int ShowAfterGameOptions(bool isGuest,
   auto screen = ScreenInteractive::Fullscreen();
   int choice = 1;
 
-  auto play_again = Button("Play Again", [&] {
+  auto play_again = Button(button_play_again, [&] {
     choice = 0;
     screen.ExitLoopClosure()();
   });
 
-  auto return_menu = Button("Return to Menu", [&] {
+  auto return_menu = Button(button_return_to_menu, [&] {
     choice = 1;
     screen.ExitLoopClosure()();
   });
 
   string sessionLabel = "";
   if (isGuest) {
-    sessionLabel = "Guest session finished";
+    sessionLabel = "Game finished for Guest";
   } else if (isAdmin) {
-    sessionLabel = "Admin session finished";
+    sessionLabel = "Game finished for Admin";
   } else {
-    sessionLabel = "Session finished for: " + username;
+    sessionLabel = "Game finished for: " + username;
   }
 
   string resultLabel = "";
@@ -746,19 +884,121 @@ int ShowAfterGameOptions(bool isGuest,
   auto container = Container::Horizontal({play_again, return_menu});
 
   auto renderer = Renderer(container, [&] {
+    Element dialogBox = vbox({
+                            VerticalSpacer(dialog_outer_padding_height),
+                            text(sessionLabel) | bold | center,
+                            separator(),
+                            VerticalSpacer(dialog_inner_padding_height),
+                            text(resultLabel) | center,
+                            VerticalSpacer(dialog_inner_padding_height),
+                            separator(),
+                            hbox(play_again->Render(),
+                                 HorizontalSpacer(dialog_button_gap_width),
+                                 return_menu->Render()) |
+                                center,
+                            VerticalSpacer(dialog_outer_padding_height),
+                        }) |
+                        border | size(WIDTH, GREATER_THAN, dialog_min_width);
+
+    return dialogBox | center;
+  });
+
+  screen.Loop(renderer);
+  return choice;
+}
+
+int ShowPlayModeDialog() {
+  auto screen = ScreenInteractive::Fullscreen();
+  int selectedLength = 0;
+
+  auto three_btn = Button("3-Letter Mode", [&] {
+    selectedLength = 3;
+    screen.ExitLoopClosure()();
+  });
+
+  auto five_btn = Button("5-Letter Mode", [&] {
+    selectedLength = 5;
+    screen.ExitLoopClosure()();
+  });
+
+  auto six_btn = Button("6-Letter Mode", [&] {
+    selectedLength = 6;
+    screen.ExitLoopClosure()();
+  });
+
+  auto back_btn = Button(button_back, [&] {
+    selectedLength = 0;
+    screen.ExitLoopClosure()();
+  });
+
+  auto menu = Container::Vertical({
+      three_btn,
+      five_btn,
+      six_btn,
+      back_btn,
+  });
+
+  auto renderer = Renderer(menu, [&] {
     return vbox({
-               text(sessionLabel) | bold | center,
+               text("Select Play Mode") | bold | center,
                separator(),
-               text(resultLabel) | center,
-               separator(),
-               hbox(play_again->Render(), separator(), return_menu->Render()) |
-                   center,
+               three_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+               five_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+               six_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+               back_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
            }) |
            center | border;
   });
 
   screen.Loop(renderer);
-  return choice;
+  return selectedLength;
+}
+
+int ShowWordBankModeDialog() {
+  auto screen = ScreenInteractive::Fullscreen();
+  int selectedLength = 0;
+
+  auto three_btn = Button("3-Letter Bank", [&] {
+    selectedLength = 3;
+    screen.ExitLoopClosure()();
+  });
+
+  auto five_btn = Button("5-Letter Bank", [&] {
+    selectedLength = 5;
+    screen.ExitLoopClosure()();
+  });
+
+  auto six_btn = Button("6-Letter Bank", [&] {
+    selectedLength = 6;
+    screen.ExitLoopClosure()();
+  });
+
+  auto back_btn = Button(button_back, [&] {
+    selectedLength = 0;
+    screen.ExitLoopClosure()();
+  });
+
+  auto menu = Container::Vertical({
+      three_btn,
+      five_btn,
+      six_btn,
+      back_btn,
+  });
+
+  auto renderer = Renderer(menu, [&] {
+    return vbox({
+               text("Select Word Bank") | bold | center,
+               separator(),
+               three_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+               five_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+               six_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+               back_btn->Render() | size(WIDTH, EQUAL, button_width) | center,
+           }) |
+           center | border;
+  });
+
+  screen.Loop(renderer);
+  return selectedLength;
 }
 
 // Leaderboard
@@ -777,8 +1017,8 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
 
   Elements lines;
   int n = (int)sorted.size();
-  if (n > 5) {
-    n = 5;
+  if (n > leaderboard_entries_to_show) {
+    n = leaderboard_entries_to_show;
   }
 
   if (n == 0) {
@@ -792,11 +1032,14 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
     }
   }
 
-  auto back = Button("Back", screen.ExitLoopClosure());
+  auto back = Button(button_back, screen.ExitLoopClosure());
 
   auto renderer = Renderer(back, [&] {
     return vbox({
-               text("Leaderboard") | bold | center,
+               text("██     ▄▄▄▄▄  ▄▄▄  ▄▄▄▄  ▄▄▄▄▄ ▄▄▄▄  ▄▄▄▄   ▄▄▄   ▄▄▄  ▄▄▄▄  ▄▄▄▄  ") | center,
+               text("██     ██▄▄  ██▀██ ██▀██ ██▄▄  ██▄█▄ ██▄██ ██▀██ ██▀██ ██▄█▄ ██▀██ ") | center,
+               text("██████ ██▄▄▄ ██▀██ ████▀ ██▄▄▄ ██ ██ ██▄█▀ ▀███▀ ██▀██ ██ ██ ████▀ ") | center,
+               VerticalSpacer(screen_section_spacer_height),
                separator(),
                vbox(lines) | center,
                separator(),
@@ -810,7 +1053,7 @@ void ShowLeaderboardDialog(const vector<Player>& players) {
 
 // Word bank admin
 
-void ShowWordBankDialog(vector<string>& wordBank) {
+void ShowWordBankDialog(vector<string>& wordBank, int wordLength) {
   int page = 0;
 
   while (true) {
@@ -846,12 +1089,12 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       }
     }
 
-    auto prev = Button("Previous", [&] {
+    auto prev = Button(button_previous, [&] {
       action = 0;
       screen.ExitLoopClosure()();
     });
 
-    auto next = Button("Next", [&] {
+    auto next = Button(button_next, [&] {
       action = 1;
       screen.ExitLoopClosure()();
     });
@@ -866,7 +1109,7 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       screen.ExitLoopClosure()();
     });
 
-    auto back = Button("Back", [&] {
+    auto back = Button(button_back, [&] {
       action = 4;
       screen.ExitLoopClosure()();
     });
@@ -877,7 +1120,10 @@ void ShowWordBankDialog(vector<string>& wordBank) {
 
     auto renderer = Renderer(container, [&] {
       return vbox({
-                 text("Word Bank") | bold | center,
+                 text("██     ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄    █████▄  ▄▄▄  ▄▄  ▄▄ ▄▄ ▄▄ ") | center,
+                 text("██ ▄█▄ ██ ██▀██ ██▄█▄ ██▀██   ██▄▄██ ██▀██ ███▄██ ██▄█▀ ") | center,
+                 text(" ▀██▀██▀  ▀███▀ ██ ██ ████▀   ██▄▄█▀ ██▀██ ██ ▀██ ██ ██ ") | center,
+                 VerticalSpacer(screen_section_spacer_height),
                  separator(),
                  text("Page " + to_string(page + 1) + " / " +
                       to_string(totalPages)) |
@@ -905,9 +1151,9 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       }
     } else if (action == 2) {
       string inputWord = "";
-      bool gotInput =
-          SingleInputDialog("Add Word", "Word: ", "5-letter word", "Add",
-                            inputWord);
+      bool gotInput = SingleInputDialog("Add Word", "Word: ",
+                                        WordPlaceholder(wordLength), "Add",
+                                        inputWord);
 
       if (!gotInput) {
         continue;
@@ -915,8 +1161,8 @@ void ShowWordBankDialog(vector<string>& wordBank) {
 
       inputWord = ToUpperWord(inputWord);
 
-      if (!IsValidWord(inputWord)) {
-        ConfirmationDialog("Word must be exactly 5 letters.");
+      if (!IsValidWord(inputWord, wordLength)) {
+        ConfirmationDialog(WordRequirementMessage(wordLength));
         continue;
       }
 
@@ -935,12 +1181,13 @@ void ShowWordBankDialog(vector<string>& wordBank) {
 
       wordBank.push_back(inputWord);
       sort(wordBank.begin(), wordBank.end());
-      SaveWordBank(wordBank);
+      SaveWordBank(wordBank, wordLength);
       ConfirmationDialog("Word added.");
     } else if (action == 3) {
       string inputWord = "";
       bool gotInput = SingleInputDialog("Remove Word", "Word: ",
-                                        "5-letter word", "Remove", inputWord);
+                                        WordPlaceholder(wordLength),
+                                        "Remove", inputWord);
 
       if (!gotInput) {
         continue;
@@ -962,7 +1209,7 @@ void ShowWordBankDialog(vector<string>& wordBank) {
       }
 
       wordBank.erase(wordBank.begin() + index);
-      SaveWordBank(wordBank);
+      SaveWordBank(wordBank, wordLength);
       ConfirmationDialog("Word removed.");
     } else {
       return;
@@ -1024,12 +1271,12 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
       }
     }
 
-    auto prev = Button("Previous", [&] {
+    auto prev = Button(button_previous, [&] {
       action = 0;
       screen.ExitLoopClosure()();
     });
 
-    auto next = Button("Next", [&] {
+    auto next = Button(button_next, [&] {
       action = 1;
       screen.ExitLoopClosure()();
     });
@@ -1039,7 +1286,7 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
       screen.ExitLoopClosure()();
     });
 
-    auto back = Button("Back", [&] {
+    auto back = Button(button_back, [&] {
       action = 3;
       screen.ExitLoopClosure()();
     });
@@ -1050,7 +1297,10 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
 
     auto renderer = Renderer(container, [&] {
       return vbox({
-                 text("Delete Players") | bold | center,
+                 text("████▄  ▄▄▄▄▄ ▄▄    ▄▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄▄▄   █████▄ ▄▄     ▄▄▄  ▄▄ ▄▄ ▄▄▄▄▄ ▄▄▄▄ ") | center,
+                 text("██  ██ ██▄▄  ██    ██▄▄    ██   ██▄▄    ██▄▄█▀ ██    ██▀██ ▀███▀ ██▄▄  ██▄█▄") | center,
+                 text("████▀  ██▄▄▄ ██▄▄▄ ██▄▄▄   ██   ██▄▄▄   ██     ██▄▄▄ ██▀██   █   ██▄▄▄ ██ ██ ") | center,
+                 VerticalSpacer(screen_section_spacer_height),
                  separator(),
                  text("Page " + to_string(page + 1) + " / " +
                       to_string(totalPages)) |
@@ -1083,7 +1333,7 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
         continue;
       }
 
-      if (username == "admin") {
+      if (username == admin_username) {
         ConfirmationDialog("Admin cannot be deleted.");
         continue;
       }
@@ -1115,7 +1365,8 @@ void ShowDeletePlayersDialog(vector<Player>& players) {
 
 GameResult RunGameFTXUI(const vector<string>& wordBank,
                         Player& player,
-                        bool dailyMode) {
+                        bool dailyMode,
+                        int wordLength) {
   GameResult result;
   result.won = false;
   result.quitToMenu = false;
@@ -1136,7 +1387,8 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
   array<Row, max_rows> rows;
 
   for (int r = 0; r < max_rows; r++) {
-    for (int c = 0; c < word_len; c++) {
+    rows[r] = Row(wordLength);
+    for (int c = 0; c < wordLength; c++) {
       rows[r].tiles[c].ch = ' ';
       rows[r].tiles[c].state = State::BLANK;
     }
@@ -1150,6 +1402,7 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
   auto screen = ScreenInteractive::Fullscreen();
 
   auto renderer = Renderer([&] {
+    int gameBoxWidth = GetGameBoxWidth(wordLength);
     Elements board;
     for (int r = 0; r < max_rows; r++) {
       board.push_back(hbox(rows[r].RenderTiles()) | center);
@@ -1173,19 +1426,49 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       modeLabel = "Mode: Normal";
     }
 
-    info.push_back(text(playerLabel) | center);
-    info.push_back(text(modeLabel) | center);
+    info.push_back(paragraphAlignCenter(playerLabel) | center);
+    info.push_back(paragraphAlignCenter(modeLabel) | center);
 
     if (player.isAdmin) {
-      info.push_back(text("Target word: " + target) | bold | center);
+      info.push_back(paragraphAlignCenter("Target word: " + target) | bold |
+                     center);
     }
 
-    return vbox({
-               vbox(info) | center,
-               separator(),
-               vbox(board) | center,
-               separator(),
-               text(message) | center,
+    Element rulesBox = vbox({
+                             text("RULES") | bold | center,
+                             separator(),
+                             text("Guess the " + to_string(wordLength) +
+                                  "-letter word!") |
+                                 center,
+                             text("You have 6 tries!") | center,
+                             VerticalSpacer(rules_spacer_height),
+                             text("Green = right letter, right spot") | center,
+                             text("Yellow = right letter, wrong spot") | center,
+                             text("Red = letter not in word") | center,
+                             VerticalSpacer(rules_spacer_height),
+                             text("ESC = pause") | center,
+                         }) |
+                         border;
+
+    Element boardBox = vbox({
+                             vbox(info) | center,
+                             separator(),
+                             vbox(board) | center,
+                             separator(),
+                             paragraphAlignCenter(message) | center,
+                         }) |
+                         border | size(WIDTH, EQUAL, gameBoxWidth);
+
+    Element rulesColumn = vbox({
+                             rulesBox | size(WIDTH, EQUAL, rules_box_width),
+                             filler(),
+                         });
+
+    return hbox({
+               HorizontalSpacer(rules_box_width),
+               boardBox | flex,
+               HorizontalSpacer(rules_box_gap),
+               rulesColumn,
            }) |
            center;
   });
@@ -1208,7 +1491,7 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       return true;
     }
 
-    if (event.is_character() && currentCol < word_len) {
+    if (event.is_character() && currentCol < wordLength) {
       string s = event.character();
 
       if (!s.empty()) {
@@ -1228,26 +1511,19 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
       return true;
     }
 
-    if (event == Event::Return && currentCol == word_len) {
+    if (event == Event::Return && currentCol == wordLength) {
       string guess = "";
-      for (int i = 0; i < word_len; i++) {
+      for (int i = 0; i < wordLength; i++) {
         guess += rows[currentRow].tiles[i].ch;
       }
 
-      EvaluateGuess(rows[currentRow], target);
+      EvaluateGuess(rows[currentRow], target, wordLength);
 
       if (guess == target) {
         gameOver = true;
         result.won = true;
         result.attemptsUsed = currentRow + 1;
-
-        message = "You won in " + to_string(result.attemptsUsed);
-        if (result.attemptsUsed == 1) {
-          message += " attempt.";
-        } else {
-          message += " attempts.";
-        }
-        message += " Press Enter to continue.";
+        message = "Press Enter to continue.";
       } else {
         currentRow++;
         currentCol = 0;
@@ -1287,9 +1563,11 @@ GameResult RunGameFTXUI(const vector<string>& wordBank,
 void PlaySessionLoop(Player& currentPlayer,
                      vector<Player>& players,
                      const vector<string>& wordBank,
-                     bool dailyMode) {
+                     bool dailyMode,
+                     int wordLength) {
   while (true) {
-    GameResult result = RunGameFTXUI(wordBank, currentPlayer, dailyMode);
+    GameResult result =
+        RunGameFTXUI(wordBank, currentPlayer, dailyMode, wordLength);
 
     if (result.quitToMenu) {
       return;
@@ -1314,7 +1592,6 @@ void PlaySessionLoop(Player& currentPlayer,
 // Main loop
 
 int main() {
-  vector<string> wordBank = LoadWordBank();
   vector<Player> players = LoadPlayers();
   Player currentPlayer = MakeGuestPlayer();
 
@@ -1323,35 +1600,35 @@ int main() {
     auto screen = ScreenInteractive::Fullscreen();
 
     if (currentPlayer.isGuest) {
-      auto login_btn = Button("Login", [&] {
+      auto login_btn = Button("🔑 Log in", [&] {
         menu_choice = 0;
         screen.ExitLoopClosure()();
       });
 
-      auto signup_btn = Button("Sign Up", [&] {
+      auto signup_btn = Button("📝 Sign up", [&] {
         menu_choice = 1;
         screen.ExitLoopClosure()();
       });
 
-      auto guest_btn = Button("Play as Guest", [&] {
+      auto guest_btn = Button("🎮 Play as Guest", [&] {
         menu_choice = 2;
         screen.ExitLoopClosure()();
       });
 
-      auto leaderboard_btn = Button("Leaderboard", [&] {
+      auto leaderboard_btn = Button("🏆 Leaderboard", [&] {
         menu_choice = 3;
         screen.ExitLoopClosure()();
       });
 
-      auto exit_btn = Button("Exit", [&] {
+      auto exit_btn = Button("🚪 Exit", [&] {
         menu_choice = 4;
         screen.ExitLoopClosure()();
       });
 
       auto menu = Container::Vertical({
+          guest_btn,
           login_btn,
           signup_btn,
-          guest_btn,
           leaderboard_btn,
           exit_btn,
       });
@@ -1360,14 +1637,15 @@ int main() {
         return vbox({
                    RenderWordleTitle(),
                    text("Not logged in") | center,
-                   text("") | size(HEIGHT, EQUAL, 1),
+                   VerticalSpacer(screen_section_spacer_height),
                    vbox({
-                       login_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
-                       signup_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
-                       guest_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       guest_btn->Render() | size(WIDTH, EQUAL, button_width),
+                       text("or") | bold | center,
+                       login_btn->Render() | size(WIDTH, EQUAL, button_width),
+                       signup_btn->Render() | size(WIDTH, EQUAL, button_width),
                        leaderboard_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
-                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, button_width),
                    }) |
                        center,
                }) |
@@ -1385,7 +1663,7 @@ int main() {
           continue;
         }
 
-        if (username == "admin" && password == "admin123") {
+        if (username == admin_username && password == admin_password) {
           currentPlayer = MakeAdminPlayer();
           ConfirmationDialog("Logged in as admin.");
           continue;
@@ -1424,8 +1702,8 @@ int main() {
         Player newPlayer;
         newPlayer.username = username;
         newPlayer.password = password;
-        newPlayer.wins = 0;
-        newPlayer.streak = 0;
+        newPlayer.wins = default_stat_value;
+        newPlayer.streak = default_stat_value;
         newPlayer.isGuest = false;
         newPlayer.isAdmin = false;
 
@@ -1438,7 +1716,18 @@ int main() {
 
       } else if (menu_choice == 2) {
         currentPlayer = MakeGuestPlayer();
-        PlaySessionLoop(currentPlayer, players, wordBank, false);
+        int wordLength = ShowPlayModeDialog();
+        if (wordLength == 0) {
+          continue;
+        }
+
+        vector<string> wordBank = LoadWordBank(wordLength);
+        if (wordBank.empty()) {
+          ConfirmationDialog("That word bank is empty.");
+          continue;
+        }
+
+        PlaySessionLoop(currentPlayer, players, wordBank, false, wordLength);
 
       } else if (menu_choice == 3) {
         players = LoadPlayers();
@@ -1449,37 +1738,37 @@ int main() {
       }
 
     } else if (currentPlayer.isAdmin) {
-      auto play_btn = Button("Play", [&] {
+      auto play_btn = Button("🎮 Play", [&] {
         menu_choice = 10;
         screen.ExitLoopClosure()();
       });
 
-      auto daily_btn = Button("Play Daily Mode", [&] {
+      auto daily_btn = Button("📆 Play Daily Mode", [&] {
         menu_choice = 11;
         screen.ExitLoopClosure()();
       });
 
-      auto word_bank_btn = Button("Word Bank", [&] {
+      auto word_bank_btn = Button("🗃️  Word Bank", [&] {
         menu_choice = 12;
         screen.ExitLoopClosure()();
       });
 
-      auto delete_players_btn = Button("Delete Player", [&] {
+      auto delete_players_btn = Button("➖ Delete Player", [&] {
         menu_choice = 13;
         screen.ExitLoopClosure()();
       });
 
-      auto leaderboard_btn = Button("Leaderboard", [&] {
+      auto leaderboard_btn = Button("🏆 Leaderboard", [&] {
         menu_choice = 14;
         screen.ExitLoopClosure()();
       });
 
-      auto logout_btn = Button("Log Out", [&] {
+      auto logout_btn = Button("🔐 Log Out", [&] {
         menu_choice = 15;
         screen.ExitLoopClosure()();
       });
 
-      auto exit_btn = Button("Exit", [&] {
+      auto exit_btn = Button("🚪 Exit", [&] {
         menu_choice = 16;
         screen.ExitLoopClosure()();
       });
@@ -1499,20 +1788,20 @@ int main() {
                    RenderWordleTitle(),
                    separator(),
                    text("Logged in as: admin") | bold | center,
-                   text("") | size(HEIGHT, EQUAL, 1),
+                   VerticalSpacer(screen_section_spacer_height),
                    vbox({
-                       play_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       play_btn->Render() | size(WIDTH, EQUAL, button_width),
                        daily_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        word_bank_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        delete_players_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        leaderboard_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        logout_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
-                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, button_width),
                    }) |
                        center,
                }) |
@@ -1522,13 +1811,34 @@ int main() {
       screen.Loop(renderer);
 
       if (menu_choice == 10) {
-        PlaySessionLoop(currentPlayer, players, wordBank, false);
+        int wordLength = ShowPlayModeDialog();
+        if (wordLength == 0) {
+          continue;
+        }
+
+        vector<string> wordBank = LoadWordBank(wordLength);
+        if (wordBank.empty()) {
+          ConfirmationDialog("That word bank is empty.");
+          continue;
+        }
+
+        PlaySessionLoop(currentPlayer, players, wordBank, false, wordLength);
       } else if (menu_choice == 11) {
-        PlaySessionLoop(currentPlayer, players, wordBank, true);
+        vector<string> wordBank = LoadWordBank(5);
+        if (wordBank.empty()) {
+          ConfirmationDialog(DailyWordBankEmptyMessage());
+          continue;
+        }
+
+        PlaySessionLoop(currentPlayer, players, wordBank, true, 5);
       } else if (menu_choice == 12) {
-        wordBank = LoadWordBank();
-        ShowWordBankDialog(wordBank);
-        wordBank = LoadWordBank();
+        int wordLength = ShowWordBankModeDialog();
+        if (wordLength == 0) {
+          continue;
+        }
+
+        vector<string> wordBank = LoadWordBank(wordLength);
+        ShowWordBankDialog(wordBank, wordLength);
       } else if (menu_choice == 13) {
         players = LoadPlayers();
         ShowDeletePlayersDialog(players);
@@ -1544,27 +1854,27 @@ int main() {
       }
 
     } else {
-      auto play_btn = Button("Play", [&] {
+      auto play_btn = Button("🎮 Play", [&] {
         menu_choice = 20;
         screen.ExitLoopClosure()();
       });
 
-      auto daily_btn = Button("Play Daily Mode", [&] {
+      auto daily_btn = Button("📆 Play Daily Mode", [&] {
         menu_choice = 21;
         screen.ExitLoopClosure()();
       });
 
-      auto leaderboard_btn = Button("Leaderboard", [&] {
+      auto leaderboard_btn = Button("🏆 Leaderboard", [&] {
         menu_choice = 22;
         screen.ExitLoopClosure()();
       });
 
-      auto logout_btn = Button("Log Out", [&] {
+      auto logout_btn = Button("🔐 Log Out", [&] {
         menu_choice = 23;
         screen.ExitLoopClosure()();
       });
 
-      auto exit_btn = Button("Exit", [&] {
+      auto exit_btn = Button("🚪 Exit", [&] {
         menu_choice = 24;
         screen.ExitLoopClosure()();
       });
@@ -1583,16 +1893,16 @@ int main() {
                    separator(),
                    text("Logged in as: " + currentPlayer.username) | bold |
                        center,
-                   text("") | size(HEIGHT, EQUAL, 1),
+                   VerticalSpacer(screen_section_spacer_height),
                    vbox({
-                       play_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                       play_btn->Render() | size(WIDTH, EQUAL, button_width),
                        daily_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        leaderboard_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
                        logout_btn->Render() |
-                           size(WIDTH, EQUAL, menu_button_width),
-                       exit_btn->Render() | size(WIDTH, EQUAL, menu_button_width),
+                           size(WIDTH, EQUAL, button_width),
+                       exit_btn->Render() | size(WIDTH, EQUAL, button_width),
                    }) |
                        center,
                }) |
@@ -1602,9 +1912,26 @@ int main() {
       screen.Loop(renderer);
 
       if (menu_choice == 20) {
-        PlaySessionLoop(currentPlayer, players, wordBank, false);
+        int wordLength = ShowPlayModeDialog();
+        if (wordLength == 0) {
+          continue;
+        }
+
+        vector<string> wordBank = LoadWordBank(wordLength);
+        if (wordBank.empty()) {
+          ConfirmationDialog("That word bank is empty.");
+          continue;
+        }
+
+        PlaySessionLoop(currentPlayer, players, wordBank, false, wordLength);
       } else if (menu_choice == 21) {
-        PlaySessionLoop(currentPlayer, players, wordBank, true);
+        vector<string> wordBank = LoadWordBank(5);
+        if (wordBank.empty()) {
+          ConfirmationDialog(DailyWordBankEmptyMessage());
+          continue;
+        }
+
+        PlaySessionLoop(currentPlayer, players, wordBank, true, 5);
       } else if (menu_choice == 22) {
         players = LoadPlayers();
         ShowLeaderboardDialog(players);

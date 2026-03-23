@@ -2,8 +2,32 @@
   "players": [
     {
       "password": "abc123",
+      "streak": 4,
+      "username": "tongan",
+      "wins": 8
+    },
+    {
+      "password": "abc123",
+      "streak": 15,
+      "username": "allynhaa",
+      "wins": 15
+    },
+    {
+      "password": "abc123",
+      "streak": 2,
+      "username": "thanu",
+      "wins": 11
+    },
+    {
+      "password": "abc123",
+      "streak": 1,
+      "username": "mary",
+      "wins": 1
+    },
+    {
+      "password": "abc123",
       "streak": 0,
-      "username": "Tongan",
+      "username": "satya",
       "wins": 0
     }
   ]
