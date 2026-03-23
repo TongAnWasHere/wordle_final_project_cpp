@@ -4,19 +4,7 @@
       "password": "abc123",
       "streak": 1,
       "username": "Tongan",
-      "wins": 11
-    },
-    {
-      "password": "abc123",
-      "streak": 0,
-      "username": "test1",
-      "wins": 0
-    },
-    {
-      "password": "abc123",
-      "streak": 1,
-      "username": "Nha",
-      "wins": 1
+      "wins": 22
     }
   ]
 }
