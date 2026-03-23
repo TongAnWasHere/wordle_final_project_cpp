@@ -58,9 +58,6 @@ static const int words_per_page = 15;
 static const int button_width = 40;
 static const int rules_box_width = 40;
 static const int rules_box_gap = 20;
-static const int game_box_width_3_letter = 32;
-static const int game_box_width_5_letter = 50;
-static const int game_box_width_6_letter = 60;
 static const int dialog_min_width = 30;
 static const int dialog_outer_padding_height = 0;
 static const int dialog_inner_padding_height = 1;
@@ -68,6 +65,8 @@ static const int dialog_button_gap_width = 3;
 static const int rules_spacer_height = 1;
 static const int tile_width = 7;
 static const int tile_height = 3;
+static const int tile_border_width = 2;
+static const int game_box_side_padding = 4;
 
 static const string guest_username = "Guest";
 static const string admin_username = "admin";
@@ -90,15 +89,10 @@ Element HorizontalSpacer(int width) {
 }
 
 int GetGameBoxWidth(int wordLength) {
-  if (wordLength == 3) {
-    return game_box_width_3_letter;
-  }
-
-  if (wordLength == 6) {
-    return game_box_width_6_letter;
-  }
-
-  return game_box_width_5_letter;
+  int tileOuterWidth = tile_width + tile_border_width;
+  int boardRowWidth = wordLength * tileOuterWidth;
+  int boardInnerWidth = boardRowWidth + game_box_side_padding * 2;
+  return boardInnerWidth + 2;
 }
 
 Element ColoredSubtitleLine(const string& left,
